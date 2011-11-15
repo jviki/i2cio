@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <assert.h>
+#include <sys/ioctl.h>
 
 #define I2C_SLAVE	0x0703	/* Change slave address			*/
 
