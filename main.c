@@ -111,6 +111,8 @@ int process_action(const char **options)
 		return 1;
 	}
 
+	verbose_print(1, "Using file %s", options[4]);
+
 	int err = 0;
 	if(options[0] != NULL)
 		err = process_read(ashex(options[0]), ashex(options[2]), &dev);
