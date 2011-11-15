@@ -11,15 +11,33 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+static int verbosity = 0;
+
 //
 // Application logic
 //
+
+void verbose_print(int level, const char *fmt, ...)
+{
+	if(level > verbosity)
+		return;
+
+	va_list arg;
+	va_start(arg, fmt);
+	vfprintf(stderr, fmt, arg);
+	va_end(arg);
+	fprintf(stderr, "\n");
+	fflush(stderr);
+}
 
 uint8_t ashex(const char *s)
 {
 	if(s[0] == '0' && tolower(s[1]) == 'x')
 		s += 2;
+
 	long v = strtol(s, NULL, 16);
+	verbose_print(2, "ashex(0x%s) == 0x%02X", s, (uint8_t) v);
+
 	return (uint8_t) v;
 }
 
@@ -37,6 +55,7 @@ int print_error(const char *fmt, ...)
 int process_read(uint8_t base, uint8_t address, struct i2cio_dev *d)
 {
 	uint8_t data;
+	verbose_print(1, "Read from device at address 0x%02X [0x%02X]", base, address);
 
 	if(i2cio_setaddr(d, base) != 0) {
 		perror("i2cio_setaddr()");
@@ -54,6 +73,8 @@ int process_read(uint8_t base, uint8_t address, struct i2cio_dev *d)
 
 int process_write(uint8_t base, uint8_t address, uint8_t data, struct i2cio_dev *d)
 {
+	verbose_print(1, "Write to device at address 0x%02X [0x%02X] data 0x%02X", base, address, data);
+
 	if(i2cio_setaddr(d, base) != 0) {
 		perror("i2cio_setaddr()");
 		return 1;
@@ -111,7 +132,7 @@ int process_action(const char **options)
 
 int print_help(const char *prog)
 {
-	fprintf(stderr, "Usage: %s [ -V | -h | -r <base> | -w <base> ] [ -c <devfile> ] [ -a <addr> ] [ -d <data> ]\n", prog);
+	fprintf(stderr, "Usage: %s [ -V | -h | -r <base> | -w <base> ] [ -c <devfile> ] [ -a <addr> ] [ -d <data> ] [ -v ]\n", prog);
 	return 0;
 }
 
@@ -127,7 +148,7 @@ int print_version(const char *prog)
 	return 0;
 }
 
-#define I2CIO_OPTS "hVr:w:a:d:c:"
+#define I2CIO_OPTS "hVr:w:a:d:c:v"
 
 int main(int argc, char **argv)
 {
@@ -166,6 +187,10 @@ int main(int argc, char **argv)
 
 		case 'c':
 			ctrldev = optarg;
+			break;
+
+		case 'v':
+			verbosity += 1;
 			break;
 
 		case '?':
