@@ -147,8 +147,7 @@ int print_help(const char *prog)
 	fprintf(stderr, "  -a <addr>     reads/writes data at address <addr> in the device\n");
 	fprintf(stderr, "  -d <data>     writes <data> (use together with -w)\n");
 	fprintf(stderr, "  -v            verbose\n");
-	fprintf(stderr, "  -L            little endian\n");
-	fprintf(stderr, "  -B            big endian (default)\n");
+	fprintf(stderr, "  -S            reverse bit endianness\n");
 	fprintf(stderr, "  -V            prints version and exits\n");
 	return 0;
 }
@@ -165,7 +164,7 @@ int print_version(const char *prog)
 	return 0;
 }
 
-#define I2CIO_OPTS "hVr:w:a:d:c:vLB"
+#define I2CIO_OPTS "hVr:w:a:d:c:vS"
 
 int main(int argc, char **argv)
 {
@@ -184,7 +183,7 @@ int main(int argc, char **argv)
 	const char *address = NULL;
 	const char *data = NULL;
 	const char *ctrldev = "/dev/i2c-0";
-	int *bits_remap = reverse;
+	int *bits_remap = identity;
 
 	while((opt = getopt(argc, argv, I2CIO_OPTS)) != -1) {
 		switch(opt) {
@@ -194,12 +193,8 @@ int main(int argc, char **argv)
 		case 'V':
 			return print_version(argv[0]);
 
-		case 'L':
-			bits_remap = identity;
-			break;
-
-		case 'B':
-			bits_remap = reverse;
+		case 'S':
+			bits_remap = reverse;;
 			break;
 
 		case 'r':
