@@ -167,6 +167,10 @@ int main(void)
 	remap_bits_test(0x86, swap_nibbles, 0x68);
 	remap_bits_test(0x95, swap_nibbles, 0x59);
 	remap_bits_test(0xFF, swap_nibbles, 0xFF);
+
+	fprintf(stderr, "special\n");
+	remap_bits_test(0x95, reverse, 0xA9);
+	remap_bits_test(0x17, reverse, 0xE8);
 }
 #endif
 
