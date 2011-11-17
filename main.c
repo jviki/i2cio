@@ -111,7 +111,13 @@ int process_action(const char **options, int remap_bits[8])
 		return 1;
 	}
 
+	if(i2cio_setbitmap(&dev, remap_bits) != 0)
+		fprintf(stderr, "Can not set bit mapping\n");
+	
 	verbose_print(1, "Using file %s", options[4]);
+	verbose_print(2, "Bit mapping: %d, %d, %d, %d, %d, %d, %d, %d", 
+	                  remap_bits[0], remap_bits[1], remap_bits[2], remap_bits[3],
+			  remap_bits[4], remap_bits[5], remap_bits[6], remap_bits[7]);
 
 	int err = 0;
 	if(options[0] != NULL)
