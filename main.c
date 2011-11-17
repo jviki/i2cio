@@ -88,7 +88,7 @@ int process_write(uint8_t base, uint8_t address, uint8_t data, struct i2cio_dev 
 	return 0;
 }
 
-int process_action(const char **options)
+int process_action(const char **options, int remap_bits[8])
 {
 	if(options[0] == NULL && options[1] == NULL)
 		return print_error("No action specified (-r or -w)");	
@@ -150,18 +150,26 @@ int print_version(const char *prog)
 	return 0;
 }
 
-#define I2CIO_OPTS "hVr:w:a:d:c:v"
+#define I2CIO_OPTS "hVr:w:a:d:c:vLB"
 
 int main(int argc, char **argv)
 {
 	int opt;
 	opterr = 0;
 
+	static int identity[8] = {
+		0, 1, 2, 3, 4, 5, 6, 7
+	};
+	static int reverse[8] = {
+		7, 6, 5, 4, 3, 2, 1, 0
+	};
+
 	const char *read_addr  = NULL;
 	const char *write_addr = NULL;
 	const char *address = NULL;
 	const char *data = NULL;
 	const char *ctrldev = "/dev/i2c-0";
+	int *bits_remap = reverse;
 
 	while((opt = getopt(argc, argv, I2CIO_OPTS)) != -1) {
 		switch(opt) {
@@ -170,6 +178,14 @@ int main(int argc, char **argv)
 
 		case 'V':
 			return print_version(argv[0]);
+
+		case 'L':
+			bits_remap = identity;
+			break;
+
+		case 'B':
+			bits_remap = reverse;
+			break;
 
 		case 'r':
 			read_addr = optarg;
@@ -208,5 +224,5 @@ int main(int argc, char **argv)
 		data,
 		ctrldev
 	};
-	return process_action(options);
+	return process_action(options, bits_remap);
 }
