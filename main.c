@@ -134,7 +134,16 @@ int process_action(const char **options, int remap_bits[8])
 
 int print_help(const char *prog)
 {
-	fprintf(stderr, "Usage: %s [ -V | -h | -r <base> | -w <base> ] [ -c <devfile> ] [ -a <addr> ] [ -d <data> ] [ -v ]\n", prog);
+	fprintf(stderr, "Usage: %s [ -V | -h | -r <base> | -w <base> ] [ -c <devfile> ] [ -a <addr> ] [ -d <data> ] [ -v ] [ -L | -B ]\n", prog);
+	fprintf(stderr, "  -r <base>     reads from device at <base> address\n");
+	fprintf(stderr, "  -w <base>     writes to device at <base> address\n");
+	fprintf(stderr, "  -c <devfile>  uses <devfile> instead of the default /dev/i2c-0\n");
+	fprintf(stderr, "  -a <addr>     reads/writes data at address <addr> in the device\n");
+	fprintf(stderr, "  -d <data>     writes <data> (use together with -w)\n");
+	fprintf(stderr, "  -v            verbose\n");
+	fprintf(stderr, "  -L            little endian\n");
+	fprintf(stderr, "  -B            big endian (default)\n");
+	fprintf(stderr, "  -V            prints version and exits\n");
 	return 0;
 }
 
