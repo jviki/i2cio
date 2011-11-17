@@ -71,7 +71,7 @@ int i2cio_write8(struct i2cio_dev *dev, uint8_t addr, uint8_t b)
 
 	uint8_t d[2];
 	d[0] = addr;
-	d[1] = b;
+	d[1] = remap_bits(dev->bitmap, b);
 
 	ssize_t wlen = write(dev->fd, d, 2);
 	return wlen != 2; // false is success
@@ -86,7 +86,10 @@ int i2cio_read8(struct i2cio_dev *dev, uint8_t addr, uint8_t *b)
 	if(wlen != 1)
 		return -1;
 
-	ssize_t rlen = read(dev->fd, b, 1);
+	uint8_t result;
+	ssize_t rlen = read(dev->fd, &result, 1);
+	*b = remap_bits(dev->bitmap, result);
+
 	return rlen != 1; // false is success
 }
 
