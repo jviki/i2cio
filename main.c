@@ -4,12 +4,12 @@
  */
 
 #include "i2cio.h"
+#include "util.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
-#include <ctype.h>
 
 static int verbosity = 0;
 
@@ -28,17 +28,6 @@ void verbose_print(int level, const char *fmt, ...)
 	va_end(arg);
 	fprintf(stderr, "\n");
 	fflush(stderr);
-}
-
-uint8_t ashex(const char *s)
-{
-	if(s[0] == '0' && tolower(s[1]) == 'x')
-		s += 2;
-
-	long v = strtol(s, NULL, 16);
-	verbose_print(2, "ashex(0x%s) == 0x%02X", s, (uint8_t) v);
-
-	return (uint8_t) v;
 }
 
 int print_error(const char *fmt, ...)
