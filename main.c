@@ -183,7 +183,7 @@ int main(int argc, char **argv)
 			return print_version(argv[0]);
 
 		case 'S':
-			bits_remap = reverse;;
+			bits_remap = reverse;
 			break;
 
 		case 'r':
