@@ -1,12 +1,11 @@
 #include "i2cio.h"
+#include "i2c-dev.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <assert.h>
 #include <sys/ioctl.h>
 #include <string.h>
-
-#define I2C_SLAVE	0x0703	/* Change slave address			*/
 
 int i2cio_init(struct i2cio_dev *dev, const char *path)
 {
@@ -69,12 +68,8 @@ int i2cio_write8(struct i2cio_dev *dev, uint8_t addr, uint8_t b)
 	assert(dev != NULL);
 	assert(dev->fd >= 0);
 
-	uint8_t d[2];
-	d[0] = addr;
-	d[1] = remap_bits(dev->bitmap, b);
-
-	ssize_t wlen = write(dev->fd, d, 2);
-	return wlen != 2; // false is success
+	uint8_t w = remap_bits(dev->bitmap, b);
+	return i2c_smbus_write_byte_data(dev->fd, addr, w);
 }
 
 int i2cio_read8(struct i2cio_dev *dev, uint8_t addr, uint8_t *b)
@@ -82,15 +77,12 @@ int i2cio_read8(struct i2cio_dev *dev, uint8_t addr, uint8_t *b)
 	assert(dev != NULL);
 	assert(dev->fd >= 0);
 
-	ssize_t wlen = write(dev->fd, &addr, 1);
-	if(wlen != 1)
+	int32_t result = i2c_smbus_read_byte_data(dev->fd, addr);
+	if(result < 0)
 		return -1;
 
-	uint8_t result;
-	ssize_t rlen = read(dev->fd, &result, 1);
-	*b = remap_bits(dev->bitmap, result);
-
-	return rlen != 1; // false is success
+	*b = remap_bits(dev->bitmap, (uint8_t) result);
+	return 0;
 }
 
 #ifdef REMAP_BIT_TEST
